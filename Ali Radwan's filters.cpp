@@ -296,30 +296,73 @@ void Croping(Image& image)
 // The Resize filter
 void Resize(Image& image)
 {
+    int newWidth, newHeight;
     string resized_width, resized_height;
-    while (true) { // Checks if input is a positive int
-        cout << "Enter the new width in pixels: ";
-        getline(cin, resized_width);
-        if (!isPositiveInteger(resized_width)) {
-            cout << "Please enter a positive integer." << endl;
-            continue;
+    string choice;
+    while (true)
+    {
+        cout << "Do you want to:\n[1] Enter the new size\n[2] Enter a ratio to resize\nEnter your choice (1/2): ";
+        getline(cin, choice);
+        if (choice == "1")
+        {
+            while (true) { // Checks if input is a positive int
+                cout << "Enter the new width: ";
+                getline(cin, resized_width);
+                if (!isPositiveInteger(resized_width) || stoi(resized_width) == 0) {
+                    cout << "Please enter a positive integer." << endl;
+                    continue;
+                }
+                break;
+            }
+
+            while (true) {// Checks if input is a positive int
+                cout << "Enter the new height: ";
+                getline(cin, resized_height);
+                if (!isPositiveInteger(resized_height) || stoi(resized_height) == 0) {
+                    cout << "Please enter a positive integer." << endl;
+                    continue;
+                }
+                break;
+            }
+            newWidth = stoi(resized_width);
+            newHeight = stoi(resized_height);
+            break;
         }
-        break;
-    }
-
-    while (true) {// Checks if input is a positive int
-        cout << "Enter the new height in pixels: ";
-        getline(cin, resized_height);
-        if (!isPositiveInteger(resized_height)) {
-            cout << "Please enter a positive integer." << endl;
-            continue;
+        else if (choice == "2")
+        {
+            string Rat_w, Rat_h;
+            int ratio_w = 0, ratio_h = 0; // Initialize ratio_w and ratio_h
+            while (true)
+            {
+                cout << "Enter the Ratio of width to use in percentage (without %): ";
+                getline(cin, Rat_w);
+                if (!isFloat(Rat_w) || stoi(Rat_w) == 0)
+                {
+                    cout << "Please enter a positive number." << endl;
+                    continue;
+                }
+                cout << "Enter the Ratio of height to use in percentage (without %): ";
+                getline(cin, Rat_h);
+                if (!isFloat(Rat_h) || stoi(Rat_h) == 0)
+                {
+                    cout << "Please enter a positive number." << endl;
+                    continue;
+                }
+                ratio_w = stoi(Rat_w); // Assign value to ratio_w
+                ratio_h = stoi(Rat_h); // Assign value to ratio_h
+                break;
+            }
+            // Cast to double to avoid loss of data in calculations
+            newWidth = static_cast<unsigned int>((image.width * ratio_w) / 100.0);
+            newHeight = static_cast<unsigned int>((image.height * ratio_h) / 100.0);
+            break;
         }
-        break;
+
+        else
+        {
+            cout << "Please enter a valid choice" << endl;
+        }
     }
-
-    int newWidth = stoi(resized_width);
-    int newHeight = stoi(resized_height);
-
     // Calculate scaling factors
     float scaleX = static_cast<float>(image.width) / newWidth;
     float scaleY = static_cast<float>(image.height) / newHeight;
@@ -342,6 +385,7 @@ void Resize(Image& image)
         }
     }
     image = resizedImage;
+
     cout << "The filter has been applied successfully\n";
     // Save the image after applying the filter to a file named "test.png"
     // and open it using the default image viewer
